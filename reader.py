@@ -1,4 +1,4 @@
-"""writer.py - serial writer
+"""reader.py - serial reader
 
 Usage: python reader.py COMn
 

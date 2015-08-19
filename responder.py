@@ -1,0 +1,77 @@
+"""responder.py - serial responder
+
+Usage: python responder.py COMn
+
+Type Ctrl-C to exit
+"""
+
+import serial
+import sys
+import time
+
+BAUD = 115200 # pulses per second
+BUFFER_SIZE = 128 #  bytes
+TIMEOUT = 1 # second
+MOTOR_DELAY = 0.4 # seconds
+
+# Max and min motor position in degrees
+POS_MAX = 168
+POS_MIN = 0
+
+def respond(request):
+    """Return a response in the format "%d %s" where %d is a signed integer
+    (0 if no error, non-zero if error), and %s is the returned info string.
+    """
+    
+    # Handle the standard request for device ID information
+    if request == '*IDN?':
+        return '0 responder.py on {}'.format(ser.name)
+
+    # Handle requests to move the motor
+    elif request.startswith('m'):
+        positions = [int(pos) for pos in request.split()[1:]]
+
+        # If position is out of bounds, return an error
+        for position in positions:
+            if not POS_MIN <= position <= POS_MAX:
+                return '404 Cannot reach {}'.format(position)
+
+        # Else return 0 and the time taken
+        time.sleep(MOTOR_DELAY)
+        print('Moved to left:{}, right:{}'.format(positions[0], positions[1]))
+
+        # Return an arbitrary time taken, based on the max position
+        return '0 {:.3f}'.format(max(positions) / 173)
+
+    elif request == '0':
+        time.sleep(MOTOR_DELAY)
+        return '0 Calibrated motors'
+
+    else:
+        return '400 Bad request'
+    
+
+if '__main__' == __name__:
+
+    if len(sys.argv) != 2:
+        print(__doc__)
+        sys.exit(1)
+
+    ser = serial.Serial(sys.argv[1], BAUD, timeout=TIMEOUT)
+    print('Responder connected to {}'.format(ser.name))
+
+    try:
+        while True:
+            request = ser.read(BUFFER_SIZE).decode().strip()
+
+            if request:
+                print('Request: {}'.format(request))
+                response = respond(request)
+                print('Response: {}'.format(response))
+                ser.write(response.encode())
+
+    except KeyboardInterrupt:
+        print('Exit OK.')
+
+    finally:
+        ser.close()
