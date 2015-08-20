@@ -9,6 +9,9 @@ import serial
 import sys
 import time
 
+
+__version__ = '0.1'
+
 BAUD = 115200 # pulses per second
 BUFFER_SIZE = 128 #  bytes
 TIMEOUT = 1 # second
@@ -24,8 +27,11 @@ def respond(request):
     """
     
     # Handle the standard request for device ID information
-    if request == '*IDN?':
-        return '0 responder.py on {}'.format(ser.name)
+    if request.startswith('h'):
+        return 'Hello'
+
+    elif request.startswith('v'):
+        return 'Version ' + __version__
 
     # Handle requests to move the motor
     elif request.startswith('m'):
@@ -43,7 +49,7 @@ def respond(request):
         # Return an arbitrary time taken, based on the max position
         return '0 {:.3f}'.format(max(positions) / 173)
 
-    elif request == '0':
+    elif request.startswith('z'):
         time.sleep(MOTOR_DELAY)
         return '0 Calibrated motors'
 
