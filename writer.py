@@ -6,9 +6,12 @@ where n is the COM port number
 Enter an empty line to exit
 """
 
-import os
 import serial
 import sys
+
+
+BAUD = 115200 # pulses per second
+
 
 if '__main__' == __name__:
 
@@ -16,7 +19,7 @@ if '__main__' == __name__:
         print(__doc__)
         sys.exit(1)
 
-    ser = serial.Serial(sys.argv[1])
+    ser = serial.Serial(sys.argv[1], BAUD)
     print('Writer connected to {}'.format(ser.name))
     print('Enter an empty line to exit.')
 
@@ -25,7 +28,9 @@ if '__main__' == __name__:
 
     try:
         while message:
-            written = ser.write((message + os.linesep).encode())
+            bytez = (message + '\r').encode()
+            print('{}: {}'.format(type(bytez), bytez), flush=True)
+            written = ser.write(bytez)
             print('{} bytes written'.format(written))
             message = input(prompt)
 

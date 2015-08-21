@@ -8,6 +8,8 @@ Type Ctrl-C to exit
 import serial
 import sys
 
+
+BAUD = 115200 # pulses per second
 TIMEOUT = 1 # second
 
 
@@ -17,9 +19,8 @@ if '__main__' == __name__:
         print(__doc__)
         sys.exit(1)
 
-    ser = serial.Serial(sys.argv[1])
+    ser = serial.Serial(sys.argv[1], BAUD, timeout=TIMEOUT)
     print('Reader connected to {}'.format(ser.name))
-    ser.setTimeout(TIMEOUT)
 
     try:
         while True:

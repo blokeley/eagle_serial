@@ -28,10 +28,10 @@ def respond(request):
     
     # Handle the standard request for device ID information
     if request.startswith('h'):
-        return 'Hello'
+        return 'Hello\r'
 
     elif request.startswith('v'):
-        return 'Version ' + __version__
+        return 'Version {}\r'.format(__version__)
 
     # Handle requests to move the motor
     elif request.startswith('m'):
@@ -40,21 +40,21 @@ def respond(request):
         # If position is out of bounds, return an error
         for position in positions:
             if not POS_MIN <= position <= POS_MAX:
-                return '404 Cannot reach {}'.format(position)
+                return '404 Cannot reach {}\r'.format(position)
 
         # Else return 0 and the time taken
         time.sleep(MOTOR_DELAY)
         print('Moved to left:{}, right:{}'.format(positions[0], positions[1]))
 
         # Return an arbitrary time taken, based on the max position
-        return '0 {:.3f}'.format(max(positions) / 173)
+        return '0 {:.3f}\r'.format(max(positions) / 173)
 
     elif request.startswith('z'):
         time.sleep(MOTOR_DELAY)
-        return '0 Calibrated motors'
+        return '0 Calibrated motors\r'
 
     else:
-        return '400 Bad request'
+        return '400 Bad request\r'
     
 
 if '__main__' == __name__:
@@ -74,7 +74,12 @@ if '__main__' == __name__:
                 print('Request: {}'.format(request))
                 response = respond(request)
                 print('Response: {}'.format(response))
-                ser.write(response.encode())
+                ser.write(response.encode())                
+                
+#                while True:
+#                    print('Response: {}'.format(response))
+#                    ser.write(response.encode())
+#                    time.sleep(TIMEOUT)
 
     except KeyboardInterrupt:
         print('Exit OK.')
