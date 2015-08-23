@@ -25,7 +25,7 @@ def respond(request):
     """Return a response in the format "%d %s" where %d is a signed integer
     (0 if no error, non-zero if error), and %s is the returned info string.
     """
-    
+
     # Handle the standard request for device ID information
     if request.startswith('h'):
         return 'Hello\r'
@@ -35,7 +35,7 @@ def respond(request):
 
     # Handle requests to move the motor
     elif request.startswith('m'):
-        positions = [int(pos) for pos in request.split()[1:]]
+        positions = [float(pos) for pos in request.split()[1:]]
 
         # If position is out of bounds, return an error
         for position in positions:
@@ -55,7 +55,7 @@ def respond(request):
 
     else:
         return '400 Bad request\r'
-    
+
 
 if '__main__' == __name__:
 
@@ -68,18 +68,13 @@ if '__main__' == __name__:
 
     try:
         while True:
-            request = ser.read(BUFFER_SIZE).decode().strip()
+            request = ser.read(BUFFER_SIZE)
 
             if request:
                 print('Request: {}'.format(request))
-                response = respond(request)
+                response = respond(request.decode().strip())
                 print('Response: {}'.format(response))
-                ser.write(response.encode())                
-                
-#                while True:
-#                    print('Response: {}'.format(response))
-#                    ser.write(response.encode())
-#                    time.sleep(TIMEOUT)
+                ser.write(response.encode())
 
     except KeyboardInterrupt:
         print('Exit OK.')

@@ -28,9 +28,7 @@ if '__main__' == __name__:
 
     try:
         while message:
-            bytez = (message + '\r').encode()
-            print('{}: {}'.format(type(bytez), bytez), flush=True)
-            written = ser.write(bytez)
+            written = ser.write((message + '\r').encode())
             print('{} bytes written'.format(written))
             message = input(prompt)
 
