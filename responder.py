@@ -28,10 +28,10 @@ def respond(request):
 
     # Handle the standard request for device ID information
     if request.startswith('h'):
-        return 'Hello\r'
+        return '0 Hello\r'
 
     elif request.startswith('v'):
-        return 'Version {}\r'.format(__version__)
+        return '0 Version {}\r'.format(__version__)
 
     # Handle requests to move the motor
     elif request.startswith('m'):
@@ -40,21 +40,21 @@ def respond(request):
         # If position is out of bounds, return an error
         for position in positions:
             if not POS_MIN <= position <= POS_MAX:
-                return '404 Cannot reach {}\r'.format(position)
+                return '400 Cannot reach {}\r'.format(position)
 
         # Else return 0 and the time taken
         time.sleep(MOTOR_DELAY)
         print('Moved to left:{}, right:{}'.format(positions[0], positions[1]))
 
         # Return an arbitrary time taken, based on the max position
-        return '0 {:.3f}\r'.format(max(positions) / 173)
+        return '0 {}\r'.format(int(1.23 * max(positions)))
 
     elif request.startswith('z'):
         time.sleep(MOTOR_DELAY)
-        return '0 Calibrated motors\r'
+        return '0 Zeroed motors\r'
 
     else:
-        return '400 Bad request\r'
+        return '400 Command not recognised\r'
 
 
 if '__main__' == __name__:
