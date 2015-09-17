@@ -16,6 +16,7 @@ BAUD = 115200 # pulses per second
 BUFFER_SIZE = 128 #  bytes
 TIMEOUT = 1 # second
 MOTOR_DELAY = 0.4 # seconds
+CALIBRATION_DELAY = 2 # seconds
 
 # Max and min motor position in degrees
 POS_MAX = 168
@@ -40,7 +41,7 @@ def respond(request):
         # If position is out of bounds, return an error
         for position in positions:
             if not POS_MIN <= position <= POS_MAX:
-                return '400 Cannot reach {}\r'.format(position)
+                return '401 Cannot reach {}\r'.format(position)
 
         # Else return 0 and the time taken
         time.sleep(MOTOR_DELAY)
@@ -50,7 +51,7 @@ def respond(request):
         return '0 {}\r'.format(int(1.23 * max(positions)))
 
     elif request.startswith('z'):
-        time.sleep(MOTOR_DELAY)
+        time.sleep(CALIBRATION_DELAY)
         return '0 Zeroed motors\r'
 
     else:
